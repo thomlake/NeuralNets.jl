@@ -16,11 +16,9 @@ function backprop(G::Graph)
     empty!(G.backward)
 end
 
-# abstract Block{F<:FloatingPoint}
-
-type Block{F<:FloatingPoint}
-    x::Matrix{F}
-    dx::Matrix{F}
+type Block
+    x::Matrix
+    dx::Matrix
 end
 
 Block(n_rows::Int, n_cols::Int) = Block(zeros(n_rows, n_cols), zeros(n_rows, n_cols))
@@ -33,13 +31,28 @@ Base.zero(b::Block) = Block(zero(b.x), zero(b.dx))
 Base.size(b::Block) = size(b.x)
 Base.size(b::Block, i::Int) = size(b.x, i)
 
-input = Block
+value(b::Block) = b.x
 
 type NeuralNet
     G::Graph
     params::Array{Block}
+    names::Dict
     feedforward::Function
 end
+
+NeuralNet(G::Graph, params::Array{Block}, fwd::Function) = NeuralNet(G, params, Dict(), fwd)
+
+function NeuralNet{T}(G::Graph, paramdict::Dict{T,Block}, fwd::Function)
+    params = Block[]
+    names = Dict{T,Int}()
+    for (i, (k, v)) in enumerate(paramdict)
+        push!(params, v)
+        names[k] = i
+    end
+    NeuralNet(G, params, names, fwd)
+end
+
+getparam(nnet::NeuralNet, key) = nnet.params[nnet.names[key]]
 
 function backprop(nnet::NeuralNet)
     G = nnet.G

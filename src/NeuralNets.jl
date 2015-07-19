@@ -10,7 +10,9 @@ export
 export 
     Graph,
     NeuralNet,
-    Block
+    Block,
+    getparam,
+    value
 
 # Graph Ops
 export 
@@ -41,9 +43,13 @@ export
     register_param_initializer!,
     Param
 
+export
+    gradcheck
+
 include("graph.jl")
 include("fit.jl")
 include("initialization.jl")
+include("utils.jl")
 
 
 end # module NeuralNets
