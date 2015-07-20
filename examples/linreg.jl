@@ -92,9 +92,10 @@ function demo()
     println("  converged after $epochs updates")
     println("  avg loss: $(loss_prev / n_samples)")
     println("[Coefficients]")
-    for (k, v) in zip(expl, value(getparam(model, :W)))
+    for (k, v) in zip(expl, getparam(model, :W))
         println("  $(rpad(k, 8)) => $(sign(v) > 0 ? "+" : "-")$(round(abs(v), 3))")
     end
 end
 
-demo()
+test()
+# demo()

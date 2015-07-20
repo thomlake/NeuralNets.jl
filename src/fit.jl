@@ -1,13 +1,13 @@
 
 function sgd(nnet::NeuralNet, lr::Real)
-    for theta in nnet.params
+    for theta in values(nnet.params)
         theta.x -= lr * theta.dx
         fill!(theta.dx, 0)
     end
 end
 
 function sgd(nnet::NeuralNet, lr::Real, gradclip::Real)
-    for theta in nnet.params
+    for theta in values(nnet.params)
         theta.x -= lr * max(min(theta.dx, gradclip), -gradclip)
         fill!(theta.dx, 0)
     end

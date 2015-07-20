@@ -35,24 +35,19 @@ value(b::Block) = b.x
 
 type NeuralNet
     G::Graph
-    params::Array{Block}
-    names::Dict
+    params::Dict{Any,Block}
     feedforward::Function
 end
 
-NeuralNet(G::Graph, params::Array{Block}, fwd::Function) = NeuralNet(G, params, Dict(), fwd)
-
-function NeuralNet{T}(G::Graph, paramdict::Dict{T,Block}, fwd::Function)
-    params = Block[]
-    names = Dict{T,Int}()
-    for (i, (k, v)) in enumerate(paramdict)
-        push!(params, v)
-        names[k] = i
+function NeuralNet(G::Graph, params::Array{Block}, fwd::Function)
+    paramdict = Dict{Symbol,Block}()
+    for i = 1:length(params)
+        paramdict[symbol("anonymous_param_$i")] = params[i]
     end
-    NeuralNet(G, params, names, fwd)
+    NeuralNet(G, paramdict, fwd)
 end
 
-getparam(nnet::NeuralNet, key) = nnet.params[nnet.names[key]]
+getparam(nnet::NeuralNet, name) = value(nnet.params[name])
 
 function backprop(nnet::NeuralNet)
     G = nnet.G
