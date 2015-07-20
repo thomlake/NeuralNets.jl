@@ -7,7 +7,7 @@
 # model on a dataset like Boston Housing is a poor choice.
 
 using RDatasets
-using MLTools
+using SoItGoes
 using NeuralNets
 
 function Model(n_in::Int, n_out::Int)
