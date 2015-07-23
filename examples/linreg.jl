@@ -10,45 +10,38 @@ using RDatasets
 using SoItGoes
 using NeuralNets
 
-function Model(n_in::Int, n_out::Int)
-    # A NeuralNet instance needs 3 parts
-    # - A Graph instance to handle backpropagation.
-    # - Parameters to be optimized.
-    # - A feedforward function that defines the computation 
-    #   performed by the model.
-
-    G = Graph()
-    W = Param(n_out, n_in)
-    b = Param(n_out)
-    
-    # Define 2 versions of feedforward. 
-    # The first version of feedforward is for training. 
-    # It accepts an input and output and applies a loss function.
-    # The second version is for making predictions. 
-    # It accepts an input and returns the prediction.
-    function feedforward(X::Matrix, Y_true::Matrix)
-        X = Block(X)
-        Y_pred = add(G, linear(G, W, X), b)
-        mseloss(Y_true, Y_pred)
-    end
-
-    function feedforward(X::Matrix)
-        X = Block(X)
-        Y_pred = add(G, linear(G, W, X), b)
-        value(Y_pred)
-    end
-
-    NeuralNet(G, [:W => W, :b => b], feedforward)
+function build_model(n_features, n_outputs)
+    model = NeuralNet()
+    model[:w] = Zeros(n_outputs, n_features)
+    model[:b] = Zeros(n_outputs)
+    return model
 end
+
+function predict(model::NeuralNet, input::Matrix, target::Matrix)
+    w = model[:w]
+    b = model[:b]
+    x = Block(input)
+    @grad model begin
+        prediction = add(linear(w, x), b)
+        cost = nll_normal(target, prediction)
+    end
+    return cost
+end
+
+predict(model::NeuralNet, input::Matrix) = add(linear(model[:w], Block(input)), model[:b])
 
 function test()
     # Example of how to apply finite difference
     # gradient checking to a NeuralNet instance.
-    X = randn(10, 2)
-    Y = randn(3, 2)
-    model = Model(size(X, 1), 3)
-    fwd() = model.feedforward(X, Y)
-    gradcheck(model, fwd)
+    n_samples = 2
+    n_features = 10
+    n_outputs = 3
+    X = randn(n_features, n_samples)
+    Y = randn(n_outputs, n_samples)
+    model = build_model(n_features, n_outputs)
+    g() = predict(model, X, Y)
+    f() = nll_normal(Y, predict(model, X))
+    gradcheck(model, g, f)
 end
 
 function demo()
@@ -68,34 +61,36 @@ function demo()
     n_samples = size(X, 2)
     n_features = length(expl)
     n_outputs = length(resp)
+    model = build_model(n_features, n_outputs)
 
-    model = Model(n_features, n_outputs)
-    loss_prev = Inf
+    cost_prev = Inf
     converged = false
     epochs = 0
 
     # Fit parameters
+    t0 = time()
     while !converged
-        loss = model.feedforward(X, Y)[1]
+        cost = predict(model, X, Y)
         backprop(model)
-        sgd(model, 0.01 / n_samples)
-        if loss >= loss_prev
+        sgd!(model, 0.01 / n_samples)
+        if cost >= cost_prev
             converged = true
         end
-        loss_prev = loss
+        cost_prev = cost
         epochs += 1
     end
+    t1 = time()
 
     println("[Info]")
     println("  number of samples: $n_samples")
     println("  number of features: $n_features")
-    println("  converged after $epochs updates")
-    println("  avg loss: $(loss_prev / n_samples)")
+    println("  converged after $epochs updates ($(round(t1 - t0, 2)) seconds)")
+    println("  avg loss: $(cost_prev / n_samples)")
     println("[Coefficients]")
-    for (k, v) in zip(expl, getparam(model, :W))
+    for (k, v) in zip(expl, value(model[:w]))
         println("  $(rpad(k, 8)) => $(sign(v) > 0 ? "+" : "-")$(round(abs(v), 3))")
     end
 end
 
 test()
-# demo()
+demo()

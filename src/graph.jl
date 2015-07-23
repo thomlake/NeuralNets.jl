@@ -2,7 +2,7 @@
 vec2mat(b::Vector) = reshape(b, (size(b, 1), 1))
 onehot(i::Int, d::Int) = (x = zeros(d); x[i] = 1; x)
 
-type Graph
+type GradFuncs
     dobackprop::Bool
     backward::Vector{Function}
 end
@@ -34,9 +34,9 @@ Base.size(b::Block, i::Int) = size(b.x, i)
 value(b::Block) = b.x
 
 type NeuralNet
-    G::Graph
-    params::Dict{Any,Block}
-    feedforward::Function
+    params::Dict{Symbol,Block}
+    bp_func_stack::Vector{Function}
+    bp_args_stack::Vector{Vector{Block}}
 end
 
 function NeuralNet(G::Graph, params::Array{Block}, fwd::Function)

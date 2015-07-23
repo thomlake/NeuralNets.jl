@@ -1,19 +1,19 @@
 
-function sgd(nnet::NeuralNet, lr::Real)
+function sgd!(nnet::NeuralNet, lr::Real)
     for theta in values(nnet.params)
         theta.x -= lr * theta.dx
         fill!(theta.dx, 0)
     end
 end
 
-function sgd(nnet::NeuralNet, lr::Real, gradclip::Real)
+function sgd!(nnet::NeuralNet, lr::Real, gradclip::Real)
     for theta in values(nnet.params)
         theta.x -= lr * max(min(theta.dx, gradclip), -gradclip)
         fill!(theta.dx, 0)
     end
 end
 
-function rmsprop(nnet::NeuralNet, cached_grads::Vector{Matrix}, lr::Real, rho::Real, gradclip::Real)
+function rmsprop!(nnet::NeuralNet, cached_grads::Vector{Matrix}, lr::Real, rho::Real, gradclip::Real)
     @assert length(nnet.params) == length(cached_grads)
     umrho = 1 - rho
     for n = 1:length(nnet.params)
@@ -29,7 +29,7 @@ function rmsprop(nnet::NeuralNet, cached_grads::Vector{Matrix}, lr::Real, rho::R
     end
 end
 
-function rmsprop(nnet::NeuralNet, cached_grads::Vector{Matrix}, lr::Real, rho::Real)
+function rmsprop!(nnet::NeuralNet, cached_grads::Vector{Matrix}, lr::Real, rho::Real)
     @assert length(nnet.params) == length(cached_grads)
     umrho = 1 - rho
     for n = 1:length(nnet.params)

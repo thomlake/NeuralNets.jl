@@ -1,8 +1,11 @@
+vec2mat(b::Vector) = reshape(b, (size(b, 1), 1))
 
-function gradcheck(nnet::NeuralNet, f::Function; eps::FloatingPoint=1e-6, tol::FloatingPoint=1e-6, verbose::Bool=true)
-    f()
+onehot(i::Int, d::Int) = (x = zeros(d); x[i] = 1; x)
+
+function gradcheck(nnet::NeuralNet, g::Function, f::Function; eps::FloatingPoint=1e-6, tol::FloatingPoint=1e-6, verbose::Bool=true)
+    g()
     backprop(nnet)
-    nnet.G.dobackprop = false
+    
     for (name, theta) in nnet.params
         for i = 1:size(theta, 1)
             for j = 1:size(theta, 2)
@@ -25,3 +28,4 @@ function gradcheck(nnet::NeuralNet, f::Function; eps::FloatingPoint=1e-6, tol::F
         println("gradcheck passed")
     end
 end
+

@@ -1,21 +1,21 @@
 module NeuralNets
 
-# Utilities
+# utils.jl
 export 
     vec2mat,
     onehot,
-    backprop
+    gradcheck
 
-# Types
+# neuralnet.jl
 export 
-    Graph,
     NeuralNet,
     Block,
-    getparam,
-    value
+    value,
+    backprop
 
-# Graph Ops
-export 
+# ops.jl
+export
+    dropout,
     tanh,
     sigmoid,
     relu,
@@ -25,31 +25,39 @@ export
     linear,
     mult,
     add,
-    minus,
-    dropout
+    minus
 
-# Loss Functions
+# loss.jl
 export
-    mseloss,
-    catloss
+    nll_normal,
+    nll_categorical
 
-# Fitting
+# fit.jl
 export
-    sgd,
-    rmsprop
+    sgd!,
+    rmsprop!
 
-# Initialization
+# initialization.jl
 export 
-    register_param_initializer!,
-    Param
+    Normal,
+    Uniform,
+    Glorot,
+    Orthonormal,
+    Sparse,
+    Identity,
+    Zeros
 
 export
-    gradcheck
+    @grad
 
-include("graph.jl")
+include("debug.jl")
+include("neuralnet.jl")
+include("utils.jl")
+include("ops.jl")
 include("fit.jl")
 include("initialization.jl")
-include("utils.jl")
+include("loss.jl")
+include("grad.jl")
 
 
 end # module NeuralNets
