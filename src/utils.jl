@@ -2,30 +2,19 @@ vec2mat(b::Vector) = reshape(b, (size(b, 1), 1))
 
 onehot(i::Int, d::Int) = (x = zeros(d); x[i] = 1; x)
 
-function gradcheck(nnet::NeuralNet, g::Function, f::Function; eps::FloatingPoint=1e-6, tol::FloatingPoint=1e-6, verbose::Bool=true)
-    g()
-    backprop(nnet)
-    
-    for (name, theta) in nnet.params
-        for i = 1:size(theta, 1)
-            for j = 1:size(theta, 2)
-                xij = theta.x[i,j]
-                theta.x[i,j] = xij + eps
-                lp = f()
-                theta.x[i,j] = xij - eps
-                lm = f()
-                theta.x[i,j] = xij
-                dxij = (lp - lm) / (2 * eps)
-                if abs(dxij - theta.dx[i,j]) > tol
-                    errmsg = "Finite difference gradient check failed! (name: $name)"
-                    errdsc = "|$(dxij) - $(theta.dx[i,j])| > $tol"
-                    error("$errmsg\n  $errdsc")
-                end
+argmax(x::Vector) = indmax(x)
+
+function argmax(x::Matrix)
+    n_rows, n_cols = size(x)
+    imax = zeros(Int, n_cols)
+    for j = 1:n_cols
+        m = -Inf
+        for i = 1:n_rows
+            if x[i,j] > m
+                m = x[i,j]
+                imax[j] = i
             end
         end
     end
-    if verbose
-        println("gradcheck passed")
-    end
+    return imax
 end
-

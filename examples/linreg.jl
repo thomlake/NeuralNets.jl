@@ -11,7 +11,7 @@ using SoItGoes
 using NeuralNets
 
 function build_model(n_features, n_outputs)
-    model = NeuralNet()
+    model = NeuralNet(Symbol)
     model[:w] = Zeros(n_outputs, n_features)
     model[:b] = Zeros(n_outputs)
     return model
@@ -22,13 +22,13 @@ function predict(model::NeuralNet, input::Matrix, target::Matrix)
     b = model[:b]
     x = Block(input)
     @grad model begin
-        prediction = add(linear(w, x), b)
+        prediction = affine(w, x, b)
         cost = nll_normal(target, prediction)
     end
     return cost
 end
 
-predict(model::NeuralNet, input::Matrix) = add(linear(model[:w], Block(input)), model[:b])
+predict(model::NeuralNet, input::Matrix) = affine(model[:w], Block(input), model[:b])
 
 function test()
     # Example of how to apply finite difference
@@ -39,9 +39,7 @@ function test()
     X = randn(n_features, n_samples)
     Y = randn(n_outputs, n_samples)
     model = build_model(n_features, n_outputs)
-    g() = predict(model, X, Y)
-    f() = nll_normal(Y, predict(model, X))
-    gradcheck(model, g, f)
+    gradcheck(model, ()->predict(model, X, Y))
 end
 
 function demo()

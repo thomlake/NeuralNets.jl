@@ -1,5 +1,5 @@
 # -- Dropout -- #
-function dropout(block::Block, p::FloatingPoint)
+function dropout(p::FloatingPoint, block::Block)
     for j = 1:size(block, 2)
         for i = 1:size(block, 1)
             if rand() < p
@@ -40,7 +40,11 @@ end
 relu(inblock::Block) = Block(max(inblock.x, 0))
 
 function bwd_relu(outblock::Block, inblock::Block)
-    inblock.dx += outblock.dx .* (outblock.x .> 0)
+    for j = 1:size(inblock, 2)
+        for i = 1:size(inblock, 1)
+            inblock.dx[i,j] += inblock.x[i,j] > 0 ? outblock.dx[i,j] : 0
+        end
+    end
 end
 
 function relu(nnet::NeuralNet, inblock::Block)

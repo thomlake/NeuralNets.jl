@@ -4,7 +4,7 @@ module NeuralNets
 export 
     vec2mat,
     onehot,
-    gradcheck
+    argmax
 
 # neuralnet.jl
 export 
@@ -23,6 +23,7 @@ export
     maxout,
     concat,
     linear,
+    affine,
     mult,
     add,
     minus
@@ -47,8 +48,13 @@ export
     Identity,
     Zeros
 
+# grad.jl
 export
     @grad
+
+# gradcheck.jl
+export
+    gradcheck
 
 include("debug.jl")
 include("neuralnet.jl")
@@ -58,6 +64,7 @@ include("fit.jl")
 include("initialization.jl")
 include("loss.jl")
 include("grad.jl")
+include("gradcheck.jl")
 
 
 end # module NeuralNets

@@ -19,14 +19,17 @@ Base.size(b::Block, i::Int) = size(b.x, i)
 
 value(b::Block) = b.x
 
-type NeuralNet
-    params::Dict{Symbol,Block}
+type NeuralNet{T}
+    params::Dict{T,Block}
     bpstack::Vector{Function}
+    metadata::Dict{Any,Any}
 end
 
-NeuralNet() = NeuralNet(Dict{Symbol,Block}(), Function[])
+NeuralNet{T}(params::Dict{T,Block}) = NeuralNet(params, Function[], Dict())
 
-NeuralNet(params::Dict{Symbol,Block}) = NeuralNet(params, Function[])
+NeuralNet() = NeuralNet(Dict{Symbol,Block}())
+
+NeuralNet(T::Type) = NeuralNet(Dict{T,Block}())
 
 function NeuralNet(a::Array{Block})
     params = Dict{Symbol,Block}()
@@ -36,9 +39,9 @@ function NeuralNet(a::Array{Block})
     return NeuralNet(params)
 end
 
-Base.getindex(nnet::NeuralNet, name::Symbol) = nnet.params[name]
+Base.getindex{T}(nnet::NeuralNet{T}, name::T) = nnet.params[name]
 
-Base.setindex!(nnet::NeuralNet, block::Block, name::Symbol) = nnet.params[name] = block
+Base.setindex!{T}(nnet::NeuralNet{T}, block::Block, name::T) = nnet.params[name] = block
 
 function backprop(nnet::NeuralNet)
     for i = length(nnet.bpstack):-1:1

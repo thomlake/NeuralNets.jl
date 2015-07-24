@@ -1,0 +1,1 @@
+julia --color test/runtests.jl
