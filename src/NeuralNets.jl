@@ -50,11 +50,9 @@ export
 export
     gradcheck
 
-# extras.jl
-export
-    nnextras
-
-module nnextras
+# extras.jl in wrapped in a module to 
+# prevent collisions and namespace pollution
+module Extras
     include("extras.jl")
 end
 

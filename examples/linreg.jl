@@ -5,10 +5,9 @@
 # This example is for demonstration purposes only.
 # Using gradient descent to fit a linear regression
 # model on a dataset like Boston Housing is a poor choice.
-
 using RDatasets
-using SoItGoes
 using NeuralNets
+const nnx = NeuralNets.Extras
 
 function build_model(n_features, n_outputs)
     model = NeuralNet(Symbol)
@@ -50,11 +49,11 @@ function demo()
     resp = [:MedV]
     expl = [:Rm, :Crim, :LStat, :PTRatio, :Dis]
     
-    # Convert data frames to Arrays and normalize to have
+    # Convert data frames to Arrays and preprocess to have
     # zero mean and unit stard deviation. Notice the arrays
     # are transposed so columns are instances and rows are features.
-    X = normalize(convert(Array{Float64}, df[:, expl]).', 2)
-    Y = normalize(convert(Array{Float64}, df[:, resp]).', 2)
+    X = nnx.zscore(convert(Array{Float64}, df[:, expl]).')
+    Y = nnx.zscore(convert(Array{Float64}, df[:, resp]).')
 
     n_samples = size(X, 2)
     n_features = length(expl)

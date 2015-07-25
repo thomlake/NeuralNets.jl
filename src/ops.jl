@@ -159,7 +159,7 @@ affine(nnet::NeuralNet, w::Block, x::Block, b::Block) = add(nnet, linear(nnet, w
 function add_mat_mat(inblock1::Block, inblock2::Block)
     @assert size(inblock1) == size(inblock2)
 
-    outblock = copy(inblock.x)
+    outblock = Block(copy(inblock1.x))
     outblock.x .+= inblock2.x
     outblock
 end

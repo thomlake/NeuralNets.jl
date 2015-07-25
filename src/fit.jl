@@ -13,12 +13,20 @@ function sgd!(nnet::NeuralNet, lr::Real, gradclip::Real)
     end
 end
 
-function rmsprop!(nnet::NeuralNet, cached_grads::Vector{Matrix}, lr::Real, rho::Real, gradclip::Real)
+
+function addcache!(nnet::NeuralNet, name)
+    nnet.metadata[name] = [n => zero(p.x) for (n, p) in nnet.params]
+end
+
+function rmsprop!(nnet::NeuralNet, lr::Real, rho::Real, gradclip::Real)
+    if !haskey(nnet.metadata, :rmsprop_cache)
+        addcache!(nnet, :rmsprop_cache)
+    end
+    cached_grads = nnet.metadata[:rmsprop_cache]
     @assert length(nnet.params) == length(cached_grads)
     umrho = 1 - rho
-    for n = 1:length(nnet.params)
-        theta = nnet.params[n]
-        cache = cached_grads[n]
+    for (name, theta) in nnet.params
+        cache = cached_grads[name]
         @assert size(theta) == size(cache)
         for i = 1:length(cache)
             cache[i] = rho * cache[i] + umrho * theta.dx[i] * theta.dx[i]
@@ -29,12 +37,15 @@ function rmsprop!(nnet::NeuralNet, cached_grads::Vector{Matrix}, lr::Real, rho::
     end
 end
 
-function rmsprop!(nnet::NeuralNet, cached_grads::Vector{Matrix}, lr::Real, rho::Real)
+function rmsprop!(nnet::NeuralNet, lr::Real, rho::Real)
+    if !haskey(nnet.metadata, :rmsprop_cache)
+        addcache!(nnet, :rmsprop_cache)
+    end
+    cached_grads = nnet.metadata[:rmsprop_cache]
     @assert length(nnet.params) == length(cached_grads)
     umrho = 1 - rho
-    for n = 1:length(nnet.params)
-        theta = nnet.params[n]
-        cache = cached_grads[n]
+    for (name, theta) in nnet.params
+        cache = cached_grads[name]
         @assert size(theta) == size(cache)
         for i = 1:length(cache)
             cache[i] = rho * cache[i] + umrho * theta.dx[i] * theta.dx[i]
