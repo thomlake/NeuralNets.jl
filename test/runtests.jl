@@ -15,7 +15,8 @@ function test_handler(r::Test.Failure)
         println()
         failed = true
     end
-    println("fail: $(r.expr)")
+    print_with_color(:red, "failure: ")
+    println(r.expr)
 end
 
 function test_handler(r::Test.Error)
@@ -24,7 +25,9 @@ function test_handler(r::Test.Error)
         println()
         failed = true
     end
-    println("fail: $(showerror(STDOUT, r))")
+    print_with_color(:red, "error:")
+    showerror(STDOUT, r)
+    println()
 end
 
 for t in tests
@@ -37,8 +40,6 @@ for t in tests
     end
     if !failed
         print_with_color(:green, " ok\n")
-    else
-        print_with_color(:red, "failure\n")
     end
 
 end

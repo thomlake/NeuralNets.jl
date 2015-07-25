@@ -9,7 +9,7 @@ Block(n_rows::Int) = Block(zeros(n_rows, 1), zeros(n_rows, 1))
 
 Block{F<:FloatingPoint}(X::Matrix{F}) = Block(X, zero(X))
 
-Block{F<:FloatingPoint}(x::Vector{F}) = Block(vec2mat(x), zeros(length(x), 1))
+Block{F<:FloatingPoint}(x::Vector{F}) = Block(nnextras.vec2mat(x), zeros(length(x), 1))
 
 Base.zero(b::Block) = Block(zero(b.x), zero(b.dx))
 

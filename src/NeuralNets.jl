@@ -1,11 +1,5 @@
 module NeuralNets
 
-# utils.jl
-export 
-    vec2mat,
-    onehot,
-    argmax
-
 # neuralnet.jl
 export 
     NeuralNet,
@@ -56,9 +50,16 @@ export
 export
     gradcheck
 
+# extras.jl
+export
+    nnextras
+
+module nnextras
+    include("extras.jl")
+end
+
 include("debug.jl")
 include("neuralnet.jl")
-include("utils.jl")
 include("ops.jl")
 include("fit.jl")
 include("initialization.jl")
