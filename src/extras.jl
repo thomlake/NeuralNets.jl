@@ -1,3 +1,5 @@
+# -- Utiliy Functions -- #
+
 vec2mat(b::Vector) = reshape(b, (size(b, 1), 1))
 
 onehot(i::Int, d::Int) = (x = zeros(d); x[i] = 1; x)
@@ -51,4 +53,12 @@ function zscore(xs::Vector{Matrix}, sigma_min::FloatingPoint=1e-6)
     end
     sigma = sqrt(sigma ./ (n - 1))
     return zscore(xs, mu, sigma, 1e-6)
+end
+
+# -- Artificial Data Generation -- #
+function randxor(T::Int)
+    x_bits = rand(0:1, T)
+    xs = [onehot(b + 1, 2) for b in x_bits]
+    ys = (cumsum(x_bits) % 2) + 1
+    return xs, ys
 end

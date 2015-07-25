@@ -93,18 +93,11 @@ function predict(nnet::NeuralNet, input::Vector)
     return predictions
 end
 
-function xor_sample(T::Int)
-    x_bits = rand(0:1, T)
-    xs = [nnx.onehot(b + 1, 2) for b in x_bits]
-    ys = (cumsum(x_bits) % 2) + 1
-    return xs, ys
-end
-
 function check_grads()
     n_in = 2
     n_hid = 5
     n_out = 2
-    xs, ys = xor_sample(20)
+    xs, ys = nnx.randxor(20)
     nnet = build_model(n_in, n_hid, n_out)    
     f() = predict(nnet, xs, ys)[1]
     gradcheck(nnet, f)
@@ -119,7 +112,7 @@ function fitrnn()
     minlen, maxlen = typemax(Int), typemin(Int)
     for i = 1:n_train
         T = rand(5:20)
-        xs, ys = xor_sample(T)
+        xs, ys = nnx.randxor(T)
         minlen = min(minlen, T)
         maxlen = max(maxlen, T)
         push!(trX, xs)
@@ -149,7 +142,7 @@ function fitrnn()
     minlen, maxlen = typemax(Int), typemin(Int)
     for i = 1:n_test
         T = rand(100:200)
-        xs, ys = xor_sample(T)
+        xs, ys = nnx.randxor(T)
         minlen = min(minlen, T)
         maxlen = max(maxlen, T)
         ps = predict(nnet, xs)
@@ -161,5 +154,5 @@ function fitrnn()
     println("  total errors => $errors")
 end
 
-# check_grads()
+check_grads()
 fitrnn()
