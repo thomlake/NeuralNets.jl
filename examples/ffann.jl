@@ -1,5 +1,6 @@
 import MNIST
 using NeuralNets
+const nnx = NeuralNets.Extras
 
 function build_model(sizes::Vector{Int})
     nnet = NeuralNet((Symbol,Int))
@@ -22,7 +23,7 @@ function predict(nnet::NeuralNet, input::Matrix{Float64}, dp::Float64=0.5)
     W = nnet[(:W,d)]
     b = nnet[(:b,d)]
     scores = affine(W, h, b)
-    return nnextras.argmax(value(scores))
+    return nnx.argmax(value(scores))
 end 
 
 function predict(nnet::NeuralNet, input::Matrix{Float64}, target::Vector{Int}, dp::Float64=0.5)
@@ -39,7 +40,7 @@ function predict(nnet::NeuralNet, input::Matrix{Float64}, target::Vector{Int}, d
         scores = affine(W, h, b)
         cost = nll_categorical(target, scores)
     end
-    return cost, nnextras.argmax(value(scores))
+    return cost, nnx.argmax(value(scores))
 end
 
 function image_string(x::Vector, symbols::Vector{Char}=['-', '+'])
@@ -54,7 +55,7 @@ end
 
 function test()
     rawX, rawY = MNIST.traindata()
-    trX = nnextras.zscore(rawX)[:,1:10]
+    trX = nnx.zscore(rawX)[:,1:10]
     trY = int(rawY + 1)[1:10]
     @assert all(isfinite(trX))
     @assert all(isfinite(trY))
@@ -68,7 +69,7 @@ end
 
 function show_example_data()
     rawX, rawY = MNIST.traindata()
-    X = nnextras.zscore(rawX)
+    X = nnx.zscore(rawX)
     @assert all(isfinite(X))
     for i = 1:10
         println(int(rawY[i]))
@@ -81,7 +82,7 @@ function fit()
     rawX, rawY = MNIST.traindata()
     const mu = mean(rawX, 2)
     const sigma = std(rawX, 2)
-    trX = nnextras.zscore(rawX, mu, sigma)
+    trX = nnx.zscore(rawX, mu, sigma)
     trY = int(rawY + 1)
     @assert all(isfinite(trX))
     @assert all(isfinite(trY))
@@ -129,7 +130,7 @@ function fit()
     println("converged after $epochs epochs")
     println("testing...")
     rawX, rawY = MNIST.testdata()
-    teX = nnextras.zscore(rawX, mu, sigma)
+    teX = nnx.zscore(rawX, mu, sigma)
     teY = int(rawY + 1)
     n_test = length(teY)
     Y_pred = predict(nnet, teX)
