@@ -41,7 +41,7 @@ function predict(model, input::Matrix, target::Vector{Int})
     return nnx.argmax(prediction)
 end
 ```
-The above function defines another version of predict which takes an extra argument, `target`. This function will be used to adjust the parameters of the model to minimize the cost. There are a few concepts that need explaining here. 
+The above function defines another version of predict which takes an extra argument, `target`. This function will be used to adjust the parameters of the model to minimize the cost. Having to define two versions of predict may seem verbose, but it is neccessary to accomodate cases when the computation for training and testing differ (like when using dropout). There are a few concepts that need explaining here. 
 
 The first is the use of the [`@paramdef`](#paramdef) macro. This is just syntactic sugar for defining variables in the current scope. In the above case it is equivalent to writing `w = model[:w]; b = model[:b];`. 
 
