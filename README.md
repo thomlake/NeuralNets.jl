@@ -39,7 +39,13 @@ function predict(model, input::Matrix, target::Vector{Int})
     return nnx.argmax(prediction)
 end
 ```
-The above function defines another version of predict which takes an extra argument, `target`. This function will be used to adjust the parameters of the model to minimize the cost. There are a few concepts that need explaining here. The first is the use of the `@paramdef` macro. This is just syntactic sugar for defining variables in the current scope. In the above case it is equivalent to writing `w = model[:w]; b = model[:b];`. The second is the `@grad` macro. This tells NeuralNets.jl to backpropagate through known operators (see Operators below for a list) in the given block of code. Lastly we apply a cost function, in this case, the negative log likelihood of a categorical variable. Notice we didn't have to tranform `prediction` first by exponentiating and normalizing, i.e. applying a softmax. For computational effieciency NeuralNets.jl internally handles this procedure, similarly to how it would be handled in a generalized linear model (GLM) package.
+The above function defines another version of predict which takes an extra argument, `target`. This function will be used to adjust the parameters of the model to minimize the cost. There are a few concepts that need explaining here. 
+
+The first is the use of the `@paramdef` macro. This is just syntactic sugar for defining variables in the current scope. In the above case it is equivalent to writing `w = model[:w]; b = model[:b];`. 
+
+The second is the `@grad` macro. This tells NeuralNets.jl to backpropagate through known operators (see Operators below for a list) in the given block of code. 
+
+Lastly we apply a cost function, in this case, the negative log likelihood of a categorical variable. Notice we didn't have to tranform `prediction` first by exponentiating and normalizing, i.e. applying a softmax. For computational effieciency NeuralNets.jl internally handles this procedure, similarly to how it would be handled in a generalized linear model (GLM) package.
 ```julia
 const X, Y = nnx.gaussblobs(n_classes, n_features, n_samples)
 for epoch = 1:100
