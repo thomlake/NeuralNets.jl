@@ -99,7 +99,7 @@ NeuralNets.jl knows how to backpropagate through the following functions:
 ## The `@paramdef` macro
 As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols, `:theta`, or tuples of symbols and integers, `(:theta, 1, 2)`. In the later case the first element must be a symbol. It will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 
 
-The tuple version is generally less useful. The typical use case of parameter keys with ints is programmatic key generation. In this case `@paramdef` maps these programmatically generated keys to back to variable names, which then have to be manipulated by the programmer.
+The tuple version is generally less useful. The typical use case of parameter keys with integers is programmatic key generation. In this case `@paramdef` maps these programmatically generated keys to back to variable names, which then have to be manipulated by the programmer.
 
 For example consider the following _deep_ neural network.
 ```julia
