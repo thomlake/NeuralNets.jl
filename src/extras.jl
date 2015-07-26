@@ -67,7 +67,7 @@ end
 
 function gaussblobs(n_classes::Int, n_dims::Int, n_samples::Int)
     mu = Vector[randn(n_dims) for i = 1:n_classes]
-    sigma = Vector[randn(n_dims) for i = 1:n_classes]
+    sigma = Vector[abs(randn(n_dims)) for i = 1:n_classes]
     X, Y = zeros(n_dims, n_samples), zeros(Int, n_samples)
     for i = 1:n_samples
         Y[i] = rand(1:n_classes)
