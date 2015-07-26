@@ -6,36 +6,20 @@ function build_model(n_in::Int, n_hid::Int, n_out::Int)
     nnet[:Wr] = Orthonormal(1.2, n_hid, n_in)
     nnet[:Wz] = Orthonormal(1.2, n_hid, n_in)
     nnet[:Wc] = Orthonormal(1.2, n_hid, n_in)
-
     nnet[:Ur] = Orthonormal(1.2, n_hid, n_hid)
     nnet[:Uz] = Orthonormal(1.2, n_hid, n_hid)
     nnet[:Uc] = Orthonormal(1.2, n_hid, n_hid)
-
     nnet[:W_out] = Orthonormal(1.2, n_out, n_hid)
-
     nnet[:h0] = Zeros(n_hid)
     nnet[:br] = Zeros(n_hid)
     nnet[:bz] = Zeros(n_hid)
     nnet[:bc] = Zeros(n_hid)
     nnet[:b_out] = Zeros(n_out)
-    
     return nnet
 end
 
 function predict(nnet::NeuralNet, input::Vector, target::Vector{Int})
-    Wr = nnet[:Wr]
-    Wz = nnet[:Wz]
-    Wc = nnet[:Wc]
-    Ur = nnet[:Ur]
-    Uz = nnet[:Uz]
-    Uc = nnet[:Uc]
-    W_out = nnet[:W_out]
-    h0 = nnet[:h0]
-    br = nnet[:br]
-    bz = nnet[:bz]
-    bc = nnet[:bc]
-    b_out = nnet[:b_out]
-
+    @paramdef nnet Wr Wz Wc Ur Uz Uc W_out h0 br bz bc b_out
     cost = 0.0
     predictions = Int[]
     x = map(Block, input)
@@ -61,19 +45,7 @@ function predict(nnet::NeuralNet, input::Vector, target::Vector{Int})
 end
 
 function predict(nnet::NeuralNet, input::Vector)
-    Wr = nnet[:Wr]
-    Wz = nnet[:Wz]
-    Wc = nnet[:Wc]
-    Ur = nnet[:Ur]
-    Uz = nnet[:Uz]
-    Uc = nnet[:Uc]
-    W_out = nnet[:W_out]
-    h0 = nnet[:h0]
-    br = nnet[:br]
-    bz = nnet[:bz]
-    bc = nnet[:bc]
-    b_out = nnet[:b_out]
-
+    @paramdef nnet Wr Wz Wc Ur Uz Uc W_out h0 br bz bc b_out
     predictions = Int[]
     x = map(Block, input)
     r = sigmoid(add(add(linear(Wr, x[1]), linear(Ur, h0)), br))
@@ -121,8 +93,11 @@ function fitrnn()
     
     nnet = build_model(n_in, n_hid, n_out)
     indices = collect(1:n_train)
-
-    for epoch = 1:50
+    epoch = 0
+    max_epochs = 50
+    println("fitting...")
+    while epoch < max_epochs
+        epoch += 1
         errors = 0
         shuffle!(indices)
         for i in indices
@@ -131,8 +106,13 @@ function fitrnn()
             backprop(nnet)
             rmsprop!(nnet, 0.01, 0.9, 3)
         end
+        if epoch % 5 == 0
+            println("epoch => $epoch, errors => $errors")
+        end
+        errors == 0 ? break : nothing
     end
     println("[train]")
+    println("  number of epochs => $epoch")
     println("  min seq length => $minlen")
     println("  max seq length => $maxlen")
     println("  total errors => $errors")

@@ -17,8 +17,9 @@ function build_model(n_features, n_outputs)
 end
 
 function predict(model::NeuralNet, input::Matrix, target::Matrix)
-    w = model[:w]
-    b = model[:b]
+    @paramdef model :w :b
+    # w = model[:w]
+    # b = model[:b]
     x = Block(input)
     @grad model begin
         prediction = affine(w, x, b)
