@@ -10,6 +10,7 @@ nnet_ops = Symbol[
     :add,
     :minus,
     :concat,
+    :decat,
     :affine
 ]
 

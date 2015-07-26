@@ -120,8 +120,16 @@ end
 mult(inblock1::Block, inblock2::Block) = Block(inblock1.x .* inblock2.x)
 
 function bwd_mult(outblock::Block, inblock1::Block, inblock2::Block)
-    inblock1.dx += outblock.dx .* inblock2.x
-    inblock2.dx += outblock.dx .* inblock1.x
+    if size(inblock1, 1) == 1
+        inblock1.dx += sum(outblock.dx .* inblock2.x, 1)
+    else
+        inblock1.dx += outblock.dx .* inblock2.x
+    end
+    if size(inblock2, 1) == 1
+        inblock2.dx += sum(outblock.dx .* inblock1.x, 1)
+    else
+        inblock2.dx += outblock.dx .* inblock1.x
+    end
 end
 
 function mult(nnet::NeuralNet, inblock1::Block, inblock2::Block)
@@ -160,8 +168,8 @@ function add_mat_mat(inblock1::Block, inblock2::Block)
 end
 
 function bwd_add_mat_mat(outblock::Block, inblock1::Block, inblock2::Block)
-    inblock1.dx .+= outblock.dx
-    inblock2.dx .+= outblock.dx
+    inblock1.dx += outblock.dx
+    inblock2.dx += outblock.dx
 end
 
 function add_mat_mat(nnet::NeuralNet, inblock1::Block, inblock2::Block)
@@ -298,7 +306,7 @@ function minus(nnet::NeuralNet, a::FloatingPoint, inblock::Block)
     outblock
 end
 
-# -- Concat --#
+# -- Concatenation --#
 function concat(inblocks::Vector{Block})
     first_size = size(inblocks[1], 2)
     for b = 2:length(inblocks)
@@ -320,6 +328,29 @@ function concat(nnet::NeuralNet, inblocks::Vector{Block})
     outblock = concat(inblocks)
     push!(nnet.bpstack, () -> bwd_concat(outblock, inblocks))
     outblock
+end
+
+
+# -- Deconcatentation -- #
+function decat(inblock::Block)
+    outblocks = Block[]
+    for i = 1:size(inblock, 1)
+        push!(outblocks, Block(value(inblock)[i,:]))
+    end
+    return outblocks
+end
+
+function bwd_decat(outblocks::Vector{Block}, inblock::Block)
+    @assert length(outblocks) == size(inblock, 1)
+    for i = 1:size(inblock, 1)
+        inblock.dx[i,:] += outblocks[i].dx
+    end
+end
+
+function decat(nnet::NeuralNet, inblock::Block)
+    outblocks = decat(inblock)
+    push!(nnet.bpstack, () -> bwd_decat(outblocks, inblock))
+    return outblocks
 end
 
 

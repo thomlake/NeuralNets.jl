@@ -16,6 +16,7 @@ export
     softmax,
     maxout,
     concat,
+    decat,
     linear,
     affine,
     mult,
@@ -30,6 +31,7 @@ export
 # fit.jl
 export
     sgd!,
+    momentum!,
     rmsprop!
 
 # initialization.jl
