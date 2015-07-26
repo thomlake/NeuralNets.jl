@@ -150,11 +150,6 @@ function linear(nnet::NeuralNet, w::Block, inblock::Block)
     outblock
 end
 
-# -- Affine (for convenience) -- #
-affine(w::Block, x::Block, b::Block) = add(linear(w, x), b)
-
-affine(nnet::NeuralNet, w::Block, x::Block, b::Block) = add(nnet, linear(nnet, w, x), b)
-
 # -- Add (2d to 2d) -- #
 function add_mat_mat(inblock1::Block, inblock2::Block)
     @assert size(inblock1) == size(inblock2)
@@ -307,3 +302,15 @@ function concat(nnet::NeuralNet, inblocks::Vector{Block})
     push!(nnet.bpstack, () -> bwd_concat(outblock, inblocks))
     outblock
 end
+
+
+# -- Convenience Functions -- #
+linear(w1::Block, x1::Block, w2::Block, x2::Block) = add(linear(w1, x1), linear(w2, x2))
+linear(nnet::NeuralNet, w1::Block, x1::Block, w2::Block, x2::Block) = add(nnet, linear(nnet, w1, x1), linear(nnet, w2, x2))
+
+affine(w::Block, x::Block, b::Block) = add(linear(w, x), b)
+affine(nnet::NeuralNet, w::Block, x::Block, b::Block) = add(nnet, linear(nnet, w, x), b)
+
+affine(w1::Block, x1::Block, w2::Block, x2::Block, b::Block) = add(add(linear(w1, x1), linear(w2, x2)), b)
+affine(nnet::NeuralNet, w1::Block, x1::Block, w2::Block, x2::Block, b::Block) = add(nnet, add(nnet, linear(nnet, w1, x1), linear(nnet, w2, x2)), b)
+

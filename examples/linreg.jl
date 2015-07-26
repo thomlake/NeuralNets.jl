@@ -10,16 +10,14 @@ using NeuralNets
 const nnx = NeuralNets.Extras
 
 function build_model(n_features, n_outputs)
-    model = NeuralNet(Symbol)
+    model = NeuralNet()
     model[:w] = Zeros(n_outputs, n_features)
     model[:b] = Zeros(n_outputs)
     return model
 end
 
 function predict(model::NeuralNet, input::Matrix, target::Matrix)
-    @paramdef model :w :b
-    # w = model[:w]
-    # b = model[:b]
+    @paramdef model w b
     x = Block(input)
     @grad model begin
         prediction = affine(w, x, b)

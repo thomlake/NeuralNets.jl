@@ -7,10 +7,10 @@ nnet_ops = Symbol[
     :maxout,
     :mult,
     :linear,
-    :affine,
     :add,
     :minus,
-    :concat
+    :concat,
+    :affine
 ]
 
 function grad_parser(nnet::Symbol, expr::Expr)

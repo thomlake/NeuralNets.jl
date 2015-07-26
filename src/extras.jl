@@ -1,5 +1,5 @@
 # -- Utiliy Functions -- #
-
+using ..NeuralNets
 vec2mat(b::Vector) = reshape(b, (size(b, 1), 1))
 
 onehot(i::Int, d::Int) = (x = zeros(d); x[i] = 1; x)
@@ -20,6 +20,8 @@ function argmax(x::Matrix)
     end
     return imax
 end
+
+argmax(x::Block) = argmax(x.x)
 
 zscore(x, mu, sigma, sigma_min::FloatingPoint=1e-6) = (x .- mu) ./ max(sigma, sigma_min)
 
@@ -62,3 +64,15 @@ function randxor(T::Int)
     ys = (cumsum(x_bits) % 2) + 1
     return xs, ys
 end
+
+function gaussblobs(n_classes::Int, n_dims::Int, n_samples::Int)
+    mu = Vector[randn(n_dims) for i = 1:n_classes]
+    sigma = Vector[randn(n_dims) for i = 1:n_classes]
+    X, Y = zeros(n_dims, n_samples), zeros(Int, n_samples)
+    for i = 1:n_samples
+        Y[i] = rand(1:n_classes)
+        X[:,i] = sigma[Y[i]] .* randn(n_dims) .+ mu[Y[i]]
+    end
+    return X, Y
+end
+

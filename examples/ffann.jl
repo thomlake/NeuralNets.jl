@@ -119,13 +119,11 @@ function fit()
             cost += cost_batch
             error += sum(Y .!= Y_pred)
             backprop(nnet)
-            # sgd!(nnet, 0.01 / length(idx))
             rmsprop!(nnet, 0.1 / length(idx), 0.8)
         end
         statusmsg(cost, error)
         frustration = tol > (bestcost - cost) ? frustration + 1 : 0
         bestcost = min(bestcost, cost)
-        cost_prev = cost
     end
     println("converged after $epochs epochs")
     println("testing...")

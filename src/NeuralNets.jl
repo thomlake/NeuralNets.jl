@@ -51,20 +51,20 @@ export
 export
     gradcheck
 
+include("neuralnet.jl")
+
 # extras.jl in wrapped in a module to 
-# prevent collisions and namespace pollution
+# prevent namespace pollution
 module Extras
     include("extras.jl")
 end
 
 include("debug.jl")
-include("neuralnet.jl")
 include("ops.jl")
 include("fit.jl")
 include("initialization.jl")
 include("loss.jl")
 include("grad.jl")
 include("gradcheck.jl")
-
 
 end # module NeuralNets
