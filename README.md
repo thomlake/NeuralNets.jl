@@ -90,11 +90,11 @@ NeuralNets.jl knows how to backpropagate through the following functions:
 - `softmax:` softmax function.
 - `wta:` [winner takes all](http://people.idsia.ch/~juergen/nips2013.pdf)
 - `mult:` element-wise multiplication
-- `linear:` linear transformation, `W * x`, or addition of two linear transformations `W * x + V * y`.
+- `linear:` linear transformation, `W * x`.
 - `add:` element-wise addition.
 - `minus:` element-wise subtraction.
 - `concat:` vector concatenation
-- `affine:` affine transformation, `W * x + b`, or addition of a linear and an affine transformations `W * x + V * y + b`.
+- `affine:` affine transformation, `W * x + b`.
 
 ## The `@paramdef` macro
 As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols, `:theta`, or tuples of symbols and integers, `(:theta, 1, 2)`. In the later case the first element must be a symbol. It will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 

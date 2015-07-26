@@ -208,6 +208,25 @@ function add(nnet::NeuralNet, inblock1::Block, inblock2::Block)
     end
 end
 
+# -- Add (arbitrary number of blocks) -- #
+function add(blocks::Block...)
+    @assert length(blocks) > 2
+    outblock = add(blocks[1], blocks[2])
+    for i = 3:length(blocks)
+        outblock = add(outblock, blocks[i])
+    end
+    return outblock
+end
+
+function add(nnet::NeuralNet, blocks::Block...)
+    @assert length(blocks) > 2
+    outblock = add(nnet, blocks[1], blocks[2])
+    for i = 3:length(blocks)
+        outblock = add(nnet, outblock, blocks[i])
+    end
+    return outblock
+end
+
 # -- Minus (2d by 2d) -- #
 function minus_mat_mat(inblock1::Block, inblock2::Block)
     @assert size(inblock1) == size(inblock2)
@@ -305,12 +324,5 @@ end
 
 
 # -- Convenience Functions -- #
-linear(w1::Block, x1::Block, w2::Block, x2::Block) = add(linear(w1, x1), linear(w2, x2))
-linear(nnet::NeuralNet, w1::Block, x1::Block, w2::Block, x2::Block) = add(nnet, linear(nnet, w1, x1), linear(nnet, w2, x2))
-
 affine(w::Block, x::Block, b::Block) = add(linear(w, x), b)
 affine(nnet::NeuralNet, w::Block, x::Block, b::Block) = add(nnet, linear(nnet, w, x), b)
-
-affine(w1::Block, x1::Block, w2::Block, x2::Block, b::Block) = add(add(linear(w1, x1), linear(w2, x2)), b)
-affine(nnet::NeuralNet, w1::Block, x1::Block, w2::Block, x2::Block, b::Block) = add(nnet, add(nnet, linear(nnet, w1, x1), linear(nnet, w2, x2)), b)
-

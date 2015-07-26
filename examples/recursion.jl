@@ -17,7 +17,7 @@ function predict(nnet::NeuralNet, input::Vector, target::Vector{Int}, h::Block=n
     c = 0.0
     x = Block(input[t])
     @grad nnet begin
-        h = tanh(affine(W, x, U, h, b1))
+        h = tanh(add(linear(W, x), linear(U, h), b1))
         scores = affine(V, h, b2)
         c = nll_categorical(target[t], scores)
     end
@@ -33,7 +33,7 @@ end
 function predict(nnet::NeuralNet, input::Vector, h::Block=nnet[:h0], t::Int=1)
     @paramdef nnet W U V b1 b2
     x = Block(input[t])
-    h = tanh(affine(W, x, U, h, b1))
+    h = tanh(add(linear(W, x), linear(U, h), b1))
     scores = affine(V, h, b2)
     p = nnx.argmax(value(scores))
     if t == length(input)
