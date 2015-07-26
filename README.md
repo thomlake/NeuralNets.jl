@@ -84,7 +84,7 @@ Lastly we write code to generate some fake data from three `n_features` dimensio
 
 ## Operators
 NeuralNets.jl knows how to backpropagate through the following functions:
-- tanh
+- `tanh:` hyperbolic tangent function.
 - `sigmoid:` logistic sigmoid function.
 - `relu:` rectified linear function.
 - `softmax:` softmax function.
