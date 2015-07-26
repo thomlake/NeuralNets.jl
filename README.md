@@ -32,7 +32,7 @@ model = NeuralNet()
 model[:w] = Zeros(n_classes, n_features)
 model[:b] = Zeros(n_classes)
 ```
-We begin by creating an empty `NeuralNet` and then defining parameters. Parameter names can be anything that can be a key in a Dict. The only parameter types currently supported are 2d Arrays. The 1 arg version of `Zeros` above results in a parameter with size `(n_classes, 1)`.
+We begin by creating an empty `NeuralNet` and then defining parameters. Parameter names can be anything that can be a key in a Dict. The only parameter types currently supported are 2d Arrays. The single argument version of `Zeros` above results in a parameter with size `(n_classes, 1)`.
 
 ```julia
 const nnx = NeuralNets.Extras
@@ -44,7 +44,7 @@ function predict(model, input::Matrix)
     return nnx.argmax(prediction)
 end
 ```
-Next we define the computation our model peforms when mapping inputs to outputs. Notice the `x = Block(input)` line. This is neccessary to allow NeuralNets.jl to incorporate the variable into the computation.
+Next we define the computation our model performs when mapping inputs to outputs. Notice the `x = Block(input)` line. This is necessary to allow NeuralNets.jl to incorporate the variable into the computation.
 
 ```julia
 function predict(model, input::Matrix, target::Vector{Int})
@@ -57,13 +57,13 @@ function predict(model, input::Matrix, target::Vector{Int})
     return nnx.argmax(prediction)
 end
 ```
-The above function defines another version of predict which takes an extra argument, `target`. This function will be used to adjust the parameters of the model to minimize the cost. Having to define two versions of predict may seem verbose, but it is neccessary to accomodate cases when the computation for training and testing differ (like when using dropout). There are a few concepts that need explaining here. 
+The above function defines another version of predict which takes an extra argument, `target`. This function will be used to adjust the parameters of the model to minimize the cost. Having to define two versions of predict may seem verbose, but it is necessary to accommodate cases when the computation for training and testing differ (like when using dropout). There are a few concepts that need explaining here. 
 
 The first is the use of the [`@paramdef`](#paramdef) macro. This is just syntactic sugar for defining variables in the current scope. In the above case it is equivalent to writing `w = model[:w]; b = model[:b];`. 
 
-The second is the `@grad` macro. This tells NeuralNets.jl to backpropagate through known operators (see Operators below for a list) in the given block of code. 
+The second is the `@grad` macro. This tells NeuralNets.jl to backpropagate through known operators (see [Operators](#Operators) below for a list) in the given block of code. 
 
-Next we apply a cost function, in this case, the negative log likelihood of a categorical variable. Notice we didn't have to transform `prediction` first by exponentiating and normalizing, i.e. applying a softmax. For computational effieciency NeuralNets.jl internally handles this procedure by applying the correct transformation, similarly to how it would be handled in a generalized linear model (GLM) package.
+Next we apply a cost function, in this case, the negative log likelihood of a categorical variable. Notice we didn't have to transform `prediction` first by exponentiating and normalizing, i.e. applying a softmax. For computational efficiency NeuralNets.jl internally handles this procedure by applying the correct transformation, similarly to how it would be handled in a generalized linear model (GLM) package.
 
 ```julia
 const X, Y = nnx.gaussblobs(n_classes, n_features, n_samples)
@@ -76,17 +76,30 @@ for epoch = 1:100
     errors > 0 || break
 end
 ```
-Lastly we write code to generate some fake data from three diagonal `n_features` dimensional gaussians with different means and standard deviations,
-and update model parameters. The three primary components of the above are
+Lastly we write code to generate some fake data from three `n_features` dimensional diagonal Gaussian distributions with different means and standard deviations, and update model parameters. The three primary components inside the loop above are
 
-- `predict`: map inputs to outputs.
-- `backprop`: compute gradients of the cost with respect to the parameters.
-- `sgd!`: take a gradient descent step to reduce the value of the cost function.
+- `predict:` map inputs to outputs.
+- `backprop:` compute gradients of the cost with respect to the parameters.
+- `sgd!:` take a gradient descent step to reduce the value of the cost function.
+
+## Operators
+NeuralNets.jl knows how to backpropagate through the following functions:
+- tanh
+- `sigmoid:` logistic sigmoid function.
+- `relu:` rectified linear function.
+- `softmax:` softmax function.
+- `wta:` [winner takes all](http://people.idsia.ch/~juergen/nips2013.pdf)
+- `mult:` element-wise multiplication
+- `linear:` linear transformation, `W * x`, or addition of two linear transformations `W * x + V * y`.
+- `add:` element-wise addition.
+- `minus:` element-wise subtraction.
+- `concat:` vector concatenation
+- `affine:` affine transformation, `W * x + b`, or addition of a linear and an affine transformations `W * x + V * y + b`.
 
 ## `@paramdef`
-As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols, `:theta`, or tuples of symbols and ints, `(:theta, 1, 2)`. In the later case the first element must be a symbol. It will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 
+As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols, `:theta`, or tuples of symbols and integers, `(:theta, 1, 2)`. In the later case the first element must be a symbol. It will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 
 
-The tuple version is generally less usefull. The typical use case of parameter keys with ints is programmatic key generation. In this case `@paramdef` maps these programmatically generated keys to variable names, which then have to be manipulated by the programmer. 
+The tuple version is generally less useful. The typical use case of parameter keys with ints is programmatic key generation. In this case `@paramdef` maps these programmatically generated keys to back to variable names, which then have to be manipulated by the programmer.
 
 For example consider the following _deep_ neural network.
 ```julia
@@ -111,6 +124,6 @@ end
 ```
 
 ## Backpropagation Technique
-The overall technique for automating backpropagation is essentially the same stack based approach employed by Andrej Karpathy's [recurrentjs](https://github.com/karpathy/recurrentjs). As computation occurs, NeuralNets.jl tracks the application of operators. The operator then internally handles how its application changes backpropagation by pushing functions onto a backpropagation stack.
+The overall technique for automating backpropagation is essentially the same stack based approach employed by Andrej Karpathy's [recurrentjs](https://github.com/karpathy/recurrentjs). As computation occurs, NeuralNets.jl tracks the application of known operators. The operator then internally handles how its application changes backpropagation by pushing functions onto a backpropagation stack.
 
 

@@ -80,8 +80,8 @@ function softmax(nnet::NeuralNet, inblock::Block)
     outblock
 end
 
-# -- Maxout -- #
-function maxout(inblock::Block)
+# -- Winner Takes All -- #
+function wta(inblock::Block)
     outblock = zero(inblock)
     for j = 1:size(inblock, 2)
         i = indmax(inblock.x[:,j])
@@ -90,16 +90,16 @@ function maxout(inblock::Block)
     outblock
 end
 
-function bwd_maxout(outblock::Block, inblock::Block)
+function bwd_wta(outblock::Block, inblock::Block)
     for j = 1:size(inblock, 2)
         i =indmax(inblock.x[:,j])
         inblock.dx[i,j] += outblock.dx[i,j]
     end
 end
 
-function maxout(nnet::NeuralNet, inblock::Block)
-    outblock = maxout(inblock)
-    push!(nnet.bpstack, () -> bwd_maxout(outblock, inblock))
+function wta(nnet::NeuralNet, inblock::Block)
+    outblock = wta(inblock)
+    push!(nnet.bpstack, () -> bwd_wta(outblock, inblock))
     outblock
 end
 

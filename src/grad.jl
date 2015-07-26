@@ -4,7 +4,7 @@ nnet_ops = Symbol[
     :sigmoid,
     :relu,
     :softmax,
-    :maxout,
+    :wta,
     :mult,
     :linear,
     :add,
