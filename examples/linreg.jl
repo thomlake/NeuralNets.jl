@@ -19,7 +19,7 @@ end
 function predict(model::NeuralNet, input::Matrix, target::Matrix)
     @paramdef model w b
     x = Block(input)
-    @grad model begin
+    @autograd model begin
         prediction = affine(w, x, b)
         cost = nll_normal(target, prediction)
     end

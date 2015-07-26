@@ -50,7 +50,7 @@ Next we define the computation our model performs when mapping inputs to outputs
 function predict(model, input::Matrix, target::Vector{Int})
     @paramdef model w b
     x = Block(input)
-    @grad model begin
+    @autograd model begin
         prediction = affine(w, x, b)
         cost = nll_categorical(target, prediction)
     end
@@ -61,12 +61,12 @@ The above function defines another version of predict which takes an extra argum
 
 The first is the use of the [`@paramdef`](#the-paramdef-macro) macro. This is just syntactic sugar for defining variables in the current scope. In the above case it is equivalent to writing `w = model[:w]; b = model[:b];`. 
 
-The second is the `@grad` macro. This tells NeuralNets.jl to backpropagate through known operators (see [Operators](#Operators) below for a list) in the given block of code. 
+The second is the `@autograd` macro. This tells NeuralNets.jl to collect information in the forward pass required to backpropagate through known operators (see [Operators](#Operators) below for a list) in the given block of code. 
 
 Next we apply a cost function, in this case, the negative log likelihood of a categorical variable. Notice we didn't have to transform `prediction` first by exponentiating and normalizing, i.e. applying a softmax. For computational efficiency NeuralNets.jl internally handles this procedure by applying the correct transformation, similarly to how it would be handled in a generalized linear model (GLM) package.
 
 ```julia
-const X, Y = nnx.gaussblobs(n_classes, n_features, n_samples)
+const X, Y = nnx.randblobs(n_classes, n_features, n_samples)
 for epoch = 1:100
     Y_pred = predict(model, X, Y)
     backprop(model)
@@ -76,7 +76,7 @@ for epoch = 1:100
     errors > 0 || break
 end
 ```
-Lastly we write code to generate some fake data from three `n_features` dimensional diagonal Gaussian distributions with different means and standard deviations, and update model parameters. The three primary components inside the loop above are
+Lastly we write code to generate some artificial data from three `n_features` dimensional diagonal Gaussian distributions with different means and standard deviations, and update model parameters. The three primary components inside the loop above are
 
 - `predict:` map inputs to outputs.
 - `backprop:` compute gradients of the cost with respect to the parameters.
@@ -95,6 +95,29 @@ NeuralNets.jl knows how to backpropagate through the following functions:
 - `minus:` element-wise subtraction.
 - `concat:` vector concatenation
 - `affine:` affine transformation, `W * x + b`.
+
+## Extensibility
+Extending NeuralNets.jl by adding new operators is relatively straightforward. This is especially true when the operator is a convenience wrapper around existing functionality. For example the definition of `affine` in `ops.jl` is simply
+```julia
+affine(w::Block, x::Block, b::Block) = add(linear(w, x), b)
+affine(nnet::NeuralNet, w::Block, x::Block, b::Block) = add(nnet, linear(nnet, w, x), b)
+```
+The first version handles the case when the call is not wrapped in a `@autograd` and the second handles the case when it is. Notice in the second case the `nnet` argument is passed to each function call. This is necessary to ensure backpropagation works correctly.
+
+When the operator is not composed exclusively of existing functions, the user must also define how to compute gradients. The definition of `tanh` serves well for demonstration purposes.
+```julia
+Base.tanh(inblock::Block) = Block(tanh(inblock.x))
+function bwd_tanh(outblock::Block, inblock::Block)
+    inblock.dx += (1 .- (outblock.x .* outblock.x)) .* outblock.dx
+end
+function Base.tanh(nnet::NeuralNet, inblock::Block)
+    outblock = tanh(inblock)
+    push!(nnet.bpstack, () -> bwd_tanh(outblock, inblock))
+    outblock
+end
+```
+
+The only remaining thing to do is to let `@autograd` know about the existence of the new operator. To do this simply add the new op to the `nnet_ops` array defined in `grad.jl`.
 
 ## The `@paramdef` macro
 As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols, `:theta`, or tuples of symbols and integers, `(:theta, 1, 2)`. In the later case the first element must be a symbol. It will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 

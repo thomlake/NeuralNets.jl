@@ -65,7 +65,19 @@ function randxor(T::Int)
     return xs, ys
 end
 
-function gaussblobs(n_classes::Int, n_dims::Int, n_samples::Int)
+function randxor(r::UnitRange{Int}, n_samples::Int=1)
+    X = Vector{Vector{Float64}}[]
+    Y = Vector{Int}[]
+    for i = 1:n_samples
+        T = rand(r)
+        xs, ys = randxor(T)
+        push!(X, xs)
+        push!(Y, ys)
+    end
+    return X, Y
+end
+
+function randblobs(n_classes::Int, n_dims::Int, n_samples::Int)
     mu = Vector[randn(n_dims) for i = 1:n_classes]
     sigma = Vector[abs(randn(n_dims)) for i = 1:n_classes]
     X, Y = zeros(n_dims, n_samples), zeros(Int, n_samples)

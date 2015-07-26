@@ -25,7 +25,7 @@ function grad_parser(nnet::Symbol, expr::Expr)
     return expr
 end
 
-macro grad(nnet::Symbol, expr::Expr)
+macro autograd(nnet::Symbol, expr::Expr)
     grad_parser(nnet, esc(expr))
 end
 

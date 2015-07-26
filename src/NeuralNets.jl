@@ -44,7 +44,7 @@ export
 
 # grad.jl
 export
-    @grad,
+    @autograd,
     @paramdef
 
 # gradcheck.jl

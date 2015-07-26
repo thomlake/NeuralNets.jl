@@ -14,7 +14,7 @@ end
 function predict(nnet::NeuralNet, input::Matrix{Float64}, target::Vector{Int})
     d = nnet.metadata[:depth]
     h = Block(input)
-    @grad nnet begin
+    @autograd nnet begin
         for i = 1:d - 1
             W = nnet[(:W,i)]
             b = nnet[(:b,i)]

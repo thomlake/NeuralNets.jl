@@ -23,7 +23,7 @@ function predict(nnet::NeuralNet, input::Vector, target::Vector{Int})
     cost = 0.0
     predictions = Int[]
     x = map(Block, input)
-    @grad nnet begin
+    @autograd nnet begin
         r = sigmoid(add(linear(Wr, x[1]), linear(Ur, h0), br))
         z = sigmoid(add(linear(Wz, x[1]), linear(Uz, h0), bz))
         c = tanh(add(linear(Wc, x[1]), mult(r, linear(Uc, h0)), bc))
@@ -80,16 +80,9 @@ function fitrnn()
     n_hid = 10
     n_out = 2
     n_train = 50
-    trX, trY = {}, {}
-    minlen, maxlen = typemax(Int), typemin(Int)
-    for i = 1:n_train
-        T = rand(5:20)
-        xs, ys = nnx.randxor(T)
-        minlen = min(minlen, T)
-        maxlen = max(maxlen, T)
-        push!(trX, xs)
-        push!(trY, ys)
-    end
+    trX, trY = nnx.randxor(5:20, n_train)
+    minlen = minimum(map(length, trX))
+    maxlen = maximum(map(length, trX))
     
     nnet = build_model(n_in, n_hid, n_out)
     indices = collect(1:n_train)
@@ -118,15 +111,13 @@ function fitrnn()
     println("  total errors => $errors")
 
     n_test = 20
+    teX, teY = nnx.randxor(100:200, n_test)
+    minlen = minimum(map(length, trX))
+    maxlen = maximum(map(length, trX))
     errors = 0
-    minlen, maxlen = typemax(Int), typemin(Int)
     for i = 1:n_test
-        T = rand(100:200)
-        xs, ys = nnx.randxor(T)
-        minlen = min(minlen, T)
-        maxlen = max(maxlen, T)
-        ps = predict(nnet, xs)
-        errors += sum(ys .!= ps)
+        Y_pred = predict(nnet, teX[i])
+        errors += sum(teY[i] .!= Y_pred)
     end
     println("[test]")
     println("  min seq length => $minlen")
