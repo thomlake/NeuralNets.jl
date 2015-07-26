@@ -1,5 +1,21 @@
 # NeuralNets.jl
-NeuralNets.jl is a Julia package for describing and training neural networks. NeuralNet.jl aims to allow arbitrary differentiable models with a scalar loss to be expressed and trained without requiring the user to write any model specific backpropagation code. The cost of this flexibility is model specification is completely up to the user.
+NeuralNets.jl is a Julia package for describing and training neural networks. NeuralNet.jl aims to allow arbitrary differentiable models with a scalar loss to be expressed natively and trained without requiring the user to write any model specific backpropagation code. The cost of this flexibility is loss of performance compared to other general purpose neural network tools, and leaving the details of model specification completely up to the user.
+
+Following this line of reasoning NeuralNets.jl has two overarching goals. The first is that by making it _relatively_ easy to express complicated models, NeuralNets.jl will allow the space of interesting models (beyond the more common feedforward and slight elaborations on Elman style recurrent neural networks) to be explored more efficiently. For example, models with [attentional components](http://arxiv.org/abs/1409.0473) and more exotic things like [Memory Networks](http://arxiv.org/abs/1503.08895) can be easily expressed in NeuralNets.jl.
+
+The second goal is clarity. The hope is that because nothing is hidden by operator overloading and behind the scenes black magic, the codebase itself will be easier to extend, and programs using NeuralNets.jl will ultimately be easier to debug and write without fighting syntax.
+
+Although similar in spirit, NeuralNets.jl is not intended as a replacement for tools like [Theano](http://deeplearning.net/software/theano/). Some notable differences are:
+
+- No GPU support.
+- No operator overloading.
+- No automatic computation graph optimization.
+- No compilation process (outside of Julia's own JIT).
+- Native control flow with `for`, `while`, etc.
+- Recursion.
+- Dynamic.
+- No fundamental difference between parameters and values.
+- Functional notation.
 
 ## Installation
 NeuralNets.jl isn't currently registered, to install use
@@ -94,9 +110,7 @@ function predict(nnet, input)
 end
 ```
 
-
-This can sometimes get a little messy, especially because NeuralNets.jl employs a functional style notation, i.e., `linear(w, x)` vs `w * x`. The hope is that because nothing is hidden by operator overloading or behind the scenes black magic, it will ultimately be easier to right bug-free and easily extensible code without fighting syntax.
-
-The overall technique is essentially the same stack based approach employed by Andrej Karpathy's [recurrentjs](https://github.com/karpathy/recurrentjs). As computation occurs tracks the application of operators.  and must be supplied as the first argument of every function call. The operator then internally handles how its application changes backpropagation by pushing functions onto a backpropagation stack.
+## Backpropagation Technique
+The overall technique for automating backpropagation is essentially the same stack based approach employed by Andrej Karpathy's [recurrentjs](https://github.com/karpathy/recurrentjs). As computation occurs, NeuralNets.jl tracks the application of operators. The operator then internally handles how its application changes backpropagation by pushing functions onto a backpropagation stack.
 
 
