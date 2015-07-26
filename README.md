@@ -82,7 +82,7 @@ for i = 1:nnet.metadata[:depth]
     nnet[(:b, i)] = Zeros(sizes[i + 1])
 end
 ```
-Using `@paramdef` in the `predict` function would require the programmer to manipulate names like `w_1, w_2, ...`. It is much simpler to just loop through these variables.
+Using `@paramdef` in the `predict` function would require the programmer to manipulate names like `w_1` and  `w_2`. It is much simpler to just loop through these variables.
 ```julia
 function predict(nnet, input)
     h = Block(input)
@@ -94,9 +94,8 @@ function predict(nnet, input)
 end
 ```
 
-The above function, which simply returns the value of `w`, demonstrates the use of the `@paramdef` macro. `@paramdef`  For tuple version
 
-This can sometimes get a little messy, especially because NeuralNets.jl employs a functional style notation, i.e., `linear(W, x)` vs `W * x`. The hope is that because nothing is hidden by operator overloading or behind the scenes black magic, it will ultimately be easier to right bug-free and easily extensible code without fighting syntax.
+This can sometimes get a little messy, especially because NeuralNets.jl employs a functional style notation, i.e., `linear(w, x)` vs `w * x`. The hope is that because nothing is hidden by operator overloading or behind the scenes black magic, it will ultimately be easier to right bug-free and easily extensible code without fighting syntax.
 
 The overall technique is essentially the same stack based approach employed by Andrej Karpathy's [recurrentjs](https://github.com/karpathy/recurrentjs). As computation occurs tracks the application of operators.  and must be supplied as the first argument of every function call. The operator then internally handles how its application changes backpropagation by pushing functions onto a backpropagation stack.
 
