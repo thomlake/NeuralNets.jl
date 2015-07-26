@@ -43,7 +43,7 @@ end
 ```
 The above function defines another version of predict which takes an extra argument, `target`. This function will be used to adjust the parameters of the model to minimize the cost. There are a few concepts that need explaining here. 
 
-The first is the use of the [`@paramdef`](##@paramdef) macro. This is just syntactic sugar for defining variables in the current scope. In the above case it is equivalent to writing `w = model[:w]; b = model[:b];`. 
+The first is the use of the [`@paramdef`](#@paramdef) macro. This is just syntactic sugar for defining variables in the current scope. In the above case it is equivalent to writing `w = model[:w]; b = model[:b];`. 
 
 The second is the `@grad` macro. This tells NeuralNets.jl to backpropagate through known operators (see Operators below for a list) in the given block of code. 
 
