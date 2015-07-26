@@ -68,7 +68,7 @@ and update model parameters. The three primary components of the above are
 - `sgd!`: take a gradient descent step to reduce the value of the cost function.
 
 ## `@paramdef`
-As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols (`:theta`), or tuples of symbols and ints (`(:theta, 1, 2)`). In the later case the first element must be a symbol. It will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 
+As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols, `:theta`, or tuples of symbols and ints, `(:theta, 1, 2)`. In the later case the first element must be a symbol. It will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 
 
 The tuple version is generally less usefull. The typical use case of parameter keys with ints is programmatic key generation. In this case `@paramdef` maps these programmatically generated keys to variable names, which then have to be manipulated by the programmer. 
 
