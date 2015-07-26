@@ -18,15 +18,15 @@ Although similar in spirit, NeuralNets.jl is not intended as a replacement for t
 - Functional notation.
 
 ## Installation
-NeuralNets.jl isn't currently registered, to install use
+NeuralNets.jl is currently unregistered, to install use
 ```julia
-Pkg.clone("https://github.com/thomlake/NeuralNets.jl.git")
-using NeuralNets
+julia> Pkg.clone("https://github.com/thomlake/NeuralNets.jl.git")
 ```
 
 ## Example
 Let's define a logistic regression model using NeuralNets.jl.
 ```julia
+using NeuralNets
 const n_classes, n_features, n_samples = 3, 20, 100
 model = NeuralNet()
 model[:w] = Zeros(n_classes, n_features)
