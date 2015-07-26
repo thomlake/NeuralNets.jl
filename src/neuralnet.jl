@@ -27,7 +27,7 @@ end
 
 NeuralNet{T}(params::Dict{T,Block}) = NeuralNet(params, Function[], Dict())
 
-NeuralNet() = NeuralNet(Dict{Symbol,Block}())
+NeuralNet() = NeuralNet(Dict{Any,Block}())
 
 NeuralNet(T::Type) = NeuralNet(Dict{T,Block}())
 
@@ -39,9 +39,9 @@ function NeuralNet(a::Array{Block})
     return NeuralNet(params)
 end
 
-Base.getindex{T}(nnet::NeuralNet{T}, name::T) = nnet.params[name]
+Base.getindex(nnet::NeuralNet, name) = nnet.params[name]
 
-Base.setindex!{T}(nnet::NeuralNet{T}, block::Block, name::T) = nnet.params[name] = block
+Base.setindex!(nnet::NeuralNet, block::Block, name) = nnet.params[name] = block
 
 function backprop(nnet::NeuralNet)
     for i = length(nnet.bpstack):-1:1

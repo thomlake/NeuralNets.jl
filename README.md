@@ -64,7 +64,34 @@ and update model parameters. The three primary components of the above are
 - `backprop`: compute gradients of the cost with respect to the parameters.
 - `sgd!`: take a gradient descent step to reduce the value of the cost function.
 
-The above function, which simply returns the value of `w`, demonstrates the use of the `@paramdef` macro. `@paramdef` works with keys which are either symbols (`:foo`), or tuples of symbols and ints where the first element is a symbol (`(:foo, 1, 2)`). For tuple version
+## `@paramdef`
+As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols (`:theta`), or tuples of symbols and ints (`(:theta, 1, 2)`). In the later case the first element must be a symbol. It will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 
+
+The tuple version is generally less usefull. The typical use case of parameter keys with ints is programmatic key generation. In this case `@paramdef` maps these programmatically generated keys to variable names, which then have to be manipulated by the programmer. 
+
+For example consider the following _deep_ neural network.
+```julia
+const sizes = [n_features, 200, 100, 200, n_outputs]
+nnet = NeuralNet()
+nnet.metadata[:depth] = length(sizes) - 1
+for i = 1:nnet.metadata[:depth]
+    nnet[(:w, i)] = Orthonormal(sqrt(2), sizes[i + 1], sizes[i])
+    nnet[(:b, i)] = Zeros(sizes[i + 1])
+end
+```
+Using `@paramdef` in the `predict` function would require the programmer to manipulate names like `w_1, w_2, ...`. It is much simpler to just loop through these variables.
+```julia
+function predict(nnet, input)
+    h = Block(input)
+    for i = 1:nnet.metadata[:depth]
+        w, b = nnet[(:w, i)], nnet[(:b, i)]
+        h = relu(affine(w, h, b))
+    end
+    return nnx.argmax(h)
+end
+```
+
+The above function, which simply returns the value of `w`, demonstrates the use of the `@paramdef` macro. `@paramdef`  For tuple version
 
 This can sometimes get a little messy, especially because NeuralNets.jl employs a functional style notation, i.e., `linear(W, x)` vs `W * x`. The hope is that because nothing is hidden by operator overloading or behind the scenes black magic, it will ultimately be easier to right bug-free and easily extensible code without fighting syntax.
 
