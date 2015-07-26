@@ -59,7 +59,7 @@ end
 ```
 The above function defines another version of predict which takes an extra argument, `target`. This function will be used to adjust the parameters of the model to minimize the cost. Having to define two versions of predict may seem verbose, but it is necessary to accommodate cases when the computation for training and testing differ (like when using dropout). There are a few concepts that need explaining here. 
 
-The first is the use of the [`@paramdef`](#paramdef) macro. This is just syntactic sugar for defining variables in the current scope. In the above case it is equivalent to writing `w = model[:w]; b = model[:b];`. 
+The first is the use of the [`@paramdef`](#the-paramdef-macro) macro. This is just syntactic sugar for defining variables in the current scope. In the above case it is equivalent to writing `w = model[:w]; b = model[:b];`. 
 
 The second is the `@grad` macro. This tells NeuralNets.jl to backpropagate through known operators (see [Operators](#Operators) below for a list) in the given block of code. 
 
@@ -96,7 +96,7 @@ NeuralNets.jl knows how to backpropagate through the following functions:
 - `concat:` vector concatenation
 - `affine:` affine transformation, `W * x + b`, or addition of a linear and an affine transformations `W * x + V * y + b`.
 
-## `@paramdef`
+## The `@paramdef` macro
 As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols, `:theta`, or tuples of symbols and integers, `(:theta, 1, 2)`. In the later case the first element must be a symbol. It will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 
 
 The tuple version is generally less useful. The typical use case of parameter keys with ints is programmatic key generation. In this case `@paramdef` maps these programmatically generated keys to back to variable names, which then have to be manipulated by the programmer.
