@@ -3,7 +3,7 @@ NeuralNets.jl is a Julia package for describing and training neural networks. Ne
 
 Following this line of reasoning NeuralNets.jl has two overarching goals. The first is to make it _relatively_ easy to express complicated models. The hope is that tools like NeuralNets.jl will allow the space of interesting models<sup>[1](#interesting-models)</sup> to be explored more efficiently. For example, models with [attentional components](http://arxiv.org/abs/1409.0473) and more exotic things like [Memory Networks](http://arxiv.org/abs/1503.08895) can be easily expressed in NeuralNets.jl. For something of a mashup between the two see the [attention.jl](https://github.com/thomlake/NeuralNets.jl/blob/master/examples/attention.jl) example.
 
-The second goal is clarity. The hope is that because nothing is hidden by behind the scenes black magic, the codebase itself will be easier to extend, and programs using NeuralNets.jl will ultimately be easier to debug and write without fighting syntax.
+The second goal is clarity. The hope is that because nothing is hidden by behind the scenes black magic, the codebase itself will be easier to extend, and programs using NeuralNets.jl will ultimately be easier to debug and write.
 
 Although similar in spirit, NeuralNets.jl is not intended as a replacement for tools like [Theano](http://deeplearning.net/software/theano/). Some notable differences are:
 
