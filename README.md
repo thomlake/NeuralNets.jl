@@ -66,7 +66,7 @@ The first is the use of the [`@paramdef`](#the-paramdef-macro) macro. This is ju
 
 The second is the `@autograd` macro. This tells NeuralNets.jl to collect information in the forward pass required to backpropagate through known operators (see [Operators](#Operators)) in the given block of code. 
 
-Next we apply a cost function, in this case, the negative log likelihood of a categorical variable. Notice we didn't have to transform `prediction` first by exponentiating and normalizing, i.e. applying a softmax. For computational efficiency NeuralNets.jl internally handles this procedure by applying the correct transformation, similarly to how it would be handled in a generalized linear model (GLM) package.
+Next we apply a cost function, in this case, the negative log likelihood of a categorical variable. Notice we didn't have to transform `prediction` first by exponentiating and normalizing, i.e. applying a softmax. For computational efficiency NeuralNets.jl internally handles this procedure by applying the correct transformation, similarly to how it might be handled in a generalized linear model (GLM) package.
 
 ```julia
 const X, Y = nnx.randblobs(n_classes, n_features, n_samples)
