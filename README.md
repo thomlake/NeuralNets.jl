@@ -27,9 +27,10 @@ julia> Pkg.clone("https://github.com/thomlake/NeuralNets.jl.git")
 ```
 
 ## Example
-Let's define a logistic regression model using NeuralNets.jl.
+As an example to introduce NeuralNets.jl, let's define a logistic regression model.
 ```julia
 using NeuralNets
+const nnx = NeuralNets.Extras
 const n_classes, n_features, n_samples = 3, 20, 100
 model = NeuralNet()
 model[:w] = Zeros(n_classes, n_features)
@@ -38,7 +39,6 @@ model[:b] = Zeros(n_classes)
 We begin by creating an empty `NeuralNet` and then defining parameters. Parameter names can be anything that can be a key in a Dict. The only parameter types currently supported are 2d Arrays. The single argument version of `Zeros` above results in a parameter with size `(n_classes, 1)`.
 
 ```julia
-const nnx = NeuralNets.Extras
 function predict(model, input::Matrix)
     w = model[:w]
     b = model[:b]
