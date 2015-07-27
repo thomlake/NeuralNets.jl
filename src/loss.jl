@@ -7,6 +7,12 @@ function nll_normal{F<:FloatingPoint}(target::Array{F}, output::Block)
     0.5 * sum(output.dx .* output.dx)
 end
 
+function nll_normal(target::FloatingPoint, output::Block)
+    @assert size(output) == (1,1)
+    output.dx += output.x .- target
+    0.5 * output.dx[1] .* output.dx[1]
+end
+
 function nll_categorical{I<:Integer}(target::Vector{I}, output::Block)
     @assert size(output, 2) == length(target)
 
