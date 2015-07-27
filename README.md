@@ -1,9 +1,9 @@
 # NeuralNets.jl
 NeuralNets.jl is a Julia package for describing and training neural networks. NeuralNet.jl aims to allow arbitrary differentiable models with a scalar loss to be expressed natively and trained without requiring the user to write any model specific backpropagation code. The cost of this flexibility is loss of performance compared to other general purpose neural network tools, and leaving the details of model specification completely up to the user.
 
-Following this line of reasoning NeuralNets.jl has two overarching goals. The first is to make it _relatively_ easy to express complicated models. The hope is that tools like NeuralNets.jl will allow the space of interesting models to be explored more efficiently. For example, models with [attentional components](http://arxiv.org/abs/1409.0473) and more exotic things like [Memory Networks](http://arxiv.org/abs/1503.08895) can be easily expressed in NeuralNets.jl. There are many other (probably better) tools for working with purely feedforward neural networks as well as slight elaborations on Elman style recurrent neural networks.
+Following this line of reasoning NeuralNets.jl has two overarching goals. The first is to make it _relatively_ easy to express complicated models. The hope is that tools like NeuralNets.jl will allow the space of interesting models to be explored more efficiently. For example, models with [attentional components](http://arxiv.org/abs/1409.0473) and more exotic things like [Memory Networks](http://arxiv.org/abs/1503.08895) can be easily expressed in NeuralNets.jl. There are many (probably better) tools for working with purely feedforward neural networks as well as slight elaborations on Elman style recurrent neural networks. NeuralNets.jl aims to be something different.
 
-The second goal is clarity. The hope is that because nothing is hidden by operator overloading and behind the scenes black magic, the codebase itself will be easier to extend, and programs using NeuralNets.jl will ultimately be easier to debug and write without fighting syntax.
+The second goal is clarity. The hope is that because nothing is hidden by behind the scenes black magic, the codebase itself will be easier to extend, and programs using NeuralNets.jl will ultimately be easier to debug and write without fighting syntax.
 
 Although similar in spirit, NeuralNets.jl is not intended as a replacement for tools like [Theano](http://deeplearning.net/software/theano/). Some notable differences are:
 
@@ -16,6 +16,9 @@ Although similar in spirit, NeuralNets.jl is not intended as a replacement for t
 - Dynamic.
 - No fundamental difference between parameters and values.
 - Functional notation.
+
+## Disclaimer
+NeuralNets.jl is very young software. There are probably bugs to be worked out and certainly optimizations to be made. Any potential user would be well advised to make use of the `gradcheck` function to test that gradients are being calculated correctly for their particular model.
 
 ## Installation
 NeuralNets.jl is currently unregistered, to install use
