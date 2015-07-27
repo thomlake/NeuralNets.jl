@@ -1,7 +1,7 @@
 # NeuralNets.jl
 NeuralNets.jl is a Julia package for describing and training neural networks. NeuralNet.jl aims to allow arbitrary differentiable models with a scalar loss to be expressed natively and trained without requiring the user to write any model specific backpropagation code. The cost of this flexibility is loss of performance compared to other general purpose neural network tools, and leaving the details of model specification completely up to the user.
 
-Following this line of reasoning NeuralNets.jl has two overarching goals. The first is that by making it _relatively_ easy to express complicated models, NeuralNets.jl will allow the space of interesting models (beyond the more common feedforward and slight elaborations on Elman style recurrent neural networks) to be explored more efficiently. For example, models with [attentional components](http://arxiv.org/abs/1409.0473) and more exotic things like [Memory Networks](http://arxiv.org/abs/1503.08895) can be easily expressed in NeuralNets.jl.
+Following this line of reasoning NeuralNets.jl has two overarching goals. The first is to make it _relatively_ easy to express complicated models. The hope is that tools like NeuralNets.jl will allow the space of interesting models to be explored more efficiently. For example, models with [attentional components](http://arxiv.org/abs/1409.0473) and more exotic things like [Memory Networks](http://arxiv.org/abs/1503.08895) can be easily expressed in NeuralNets.jl. There are many other (probably better) tools for working with purely feedforward neural networks as well as slight elaborations on Elman style recurrent neural networks.
 
 The second goal is clarity. The hope is that because nothing is hidden by operator overloading and behind the scenes black magic, the codebase itself will be easier to extend, and programs using NeuralNets.jl will ultimately be easier to debug and write without fighting syntax.
 
@@ -61,7 +61,7 @@ The above function defines another version of predict which takes an extra argum
 
 The first is the use of the [`@paramdef`](#the-paramdef-macro) macro. This is just syntactic sugar for defining variables in the current scope. In the above case it is equivalent to writing `w = model[:w]; b = model[:b];`. 
 
-The second is the `@autograd` macro. This tells NeuralNets.jl to collect information in the forward pass required to backpropagate through known operators (see [Operators](#Operators) below for a list) in the given block of code. 
+The second is the `@autograd` macro. This tells NeuralNets.jl to collect information in the forward pass required to backpropagate through known operators (see [Operators](#Operators)) in the given block of code. 
 
 Next we apply a cost function, in this case, the negative log likelihood of a categorical variable. Notice we didn't have to transform `prediction` first by exponentiating and normalizing, i.e. applying a softmax. For computational efficiency NeuralNets.jl internally handles this procedure by applying the correct transformation, similarly to how it would be handled in a generalized linear model (GLM) package.
 
@@ -93,7 +93,8 @@ NeuralNets.jl knows how to backpropagate through the following functions:
 - `linear:` linear transformation, `W * x`.
 - `add:` element-wise addition.
 - `minus:` element-wise subtraction.
-- `concat:` vector concatenation
+- `concat:` vector concatenation.
+- `decat:` vector de-concatenation.
 - `affine:` affine transformation, `W * x + b`.
 
 ## Extensibility
@@ -102,7 +103,8 @@ Extending NeuralNets.jl by adding new operators is relatively straightforward. T
 affine(w::Block, x::Block, b::Block) = add(linear(w, x), b)
 affine(nnet::NeuralNet, w::Block, x::Block, b::Block) = add(nnet, linear(nnet, w, x), b)
 ```
-The first version handles the case when the call is not wrapped in a `@autograd` and the second handles the case when it is. Notice in the second case the `nnet` argument is passed to each function call. This is necessary to ensure backpropagation works correctly.
+
+The first function version handles the case when the call is not wrapped in a `@autograd` and the second handles the case when it is. Notice in the second case the `nnet` argument is passed to each function call. This is necessary to ensure backpropagation works correctly.
 
 When the operator is not composed exclusively of existing functions, the user must also define how to compute gradients. The definition of `tanh` serves well for demonstration purposes.
 ```julia
@@ -134,6 +136,7 @@ for i = 1:nnet.metadata[:depth]
     nnet[(:b, i)] = Zeros(sizes[i + 1])
 end
 ```
+
 Using `@paramdef` in the `predict` function would require the programmer to manipulate names like `w_1` and  `w_2`. It is much simpler to just loop through these variables.
 ```julia
 function predict(nnet, input)
