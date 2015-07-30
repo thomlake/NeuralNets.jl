@@ -1,5 +1,5 @@
 # NeuralNets.jl
-_automatic backpropagation for complicated neural networks_
+> automatic backpropagation for complicated neural networks
 
 ## About
 NeuralNets.jl is a Julia package for natively expressing and training a rich class of models whose parameters are differentiable with respect to a scalar loss function. 
