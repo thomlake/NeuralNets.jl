@@ -1,21 +1,30 @@
 # NeuralNets.jl
-NeuralNets.jl is a Julia package for describing and training neural networks. NeuralNet.jl aims to allow arbitrary differentiable models with a scalar loss to be expressed natively and trained without requiring the user to write any model specific backpropagation code. The cost of this flexibility is loss of performance compared to other general purpose neural network tools, and leaving the details of model specification completely up to the user.
+_automatic backpropagation for complicated neural networks_
 
-Following this line of reasoning NeuralNets.jl has two overarching goals. The first is to make it _relatively_ easy to express complicated models. The hope is that tools like NeuralNets.jl will allow the space of interesting models<sup>[1](#interesting-models)</sup> to be explored more efficiently. For example, models with [attentional components](http://arxiv.org/abs/1409.0473) and more exotic things like [Memory Networks](http://arxiv.org/abs/1503.08895) can be easily expressed in NeuralNets.jl. For something of a mashup between the two see the [attention.jl](https://github.com/thomlake/NeuralNets.jl/blob/master/examples/attention.jl) example.
+## About
+NeuralNets.jl is a Julia package for natively expressing and training a rich class of models whose parameters are differentiable with respect to a scalar loss function. 
+
+NeuralNets.jl has two overarching goals. The first is to make it _relatively_ easy to express complicated neural networks. For example, models with [attentional components](http://arxiv.org/abs/1409.0473) or arbitrary size persistent [memory structures](http://arxiv.org/abs/1503.08895) can be easily expressed in NeuralNets.jl (see [attention.jl](https://github.com/thomlake/NeuralNets.jl/blob/master/examples/attention.jl) for an example).
 
 The second goal is clarity. The hope is that because nothing is hidden by behind the scenes black magic, the codebase itself will be easier to extend, and programs using NeuralNets.jl will ultimately be easier to debug and write.
 
+## Features
+- Automatic gradient computation.
+- No compilation process (outside of Julia's own JIT compiler).
+- Native control flow structures (`for`, `while`, etc).
+- Recursion.
+- Functional notation.
+
+## Un-Features
+- No GPU support.
+- No automatic computation graph optimization.
+- No memory pre-allocation or reuse.
+- Functional notation.
+
+## Why?
 Although similar in spirit, NeuralNets.jl is not intended as a replacement for tools like [Theano](http://deeplearning.net/software/theano/). Some notable differences are:
 
-- No GPU support.
-- No operator overloading.
-- No automatic computation graph optimization.
-- No compilation process (outside of Julia's own JIT).
-- Native control flow with `for`, `while`, etc.
-- Recursion.
-- Dynamic.
-- No fundamental difference between parameters and values.
-- Functional notation.
+
 
 ## Disclaimer
 NeuralNets.jl is very young software. There are probably at least a few bugs to be worked out, and certainly many optimizations to be made. Any potential user would be well advised to make use of the `gradcheck` function to test that gradients are being calculated correctly for their particular model.
