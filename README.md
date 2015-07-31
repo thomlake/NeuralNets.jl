@@ -1,12 +1,7 @@
 # NeuralNets.jl
-> automatic backpropagation for complicated neural networks
+NeuralNets.jl is a Julia package for expressing and training a rich class of neural networks whose parameters are differentiable with respect to a scalar loss function.
 
-## About
-NeuralNets.jl is a Julia package for natively expressing and training a rich class of models whose parameters are differentiable with respect to a scalar loss function. 
-
-NeuralNets.jl has two overarching goals. The first is to make it _relatively_ easy to express complicated neural networks. For example, models with [attentional components](http://arxiv.org/abs/1409.0473) or arbitrary size persistent [memory structures](http://arxiv.org/abs/1503.08895) can be easily expressed in NeuralNets.jl (see [attention.jl](https://github.com/thomlake/NeuralNets.jl/blob/master/examples/attention.jl) for an example).
-
-The second goal is clarity. The hope is that because nothing is hidden by behind the scenes black magic, the codebase itself will be easier to extend, and programs using NeuralNets.jl will ultimately be easier to debug and write.
+Computations are described natively within Julia, making it _relatively_ easy to express complicated neural networks. For example, models with [attentional components](http://arxiv.org/abs/1409.0473) or arbitrary size persistent [memory structures](http://arxiv.org/abs/1503.08895) can be easily expressed using NeuralNets.jl (see [attention.jl](https://github.com/thomlake/NeuralNets.jl/blob/master/examples/attention.jl) for an example).
 
 ## Features
 - Automatic gradient computation.
@@ -22,9 +17,9 @@ The second goal is clarity. The hope is that because nothing is hidden by behind
 - Functional notation.
 
 ## Why?
-Although similar in spirit, NeuralNets.jl is not intended as a replacement for tools like [Theano](http://deeplearning.net/software/theano/). Some notable differences are:
+NeuralNets.jl was created because I was tired of having two options in my own research 1.) Wrangle my model into one of the many existing neural network libraries like [Theano](http://deeplearning.net/software/theano/) or [Torch](http://torch.ch/); 2.) Write my own backpropagation code.
 
-
+Neither of these options are optimal, and I was tired of wasting time in a debug-compile loop trying to get Theano's `scan` function to do what I want, so I decided to implement something different. 
 
 ## Disclaimer
 NeuralNets.jl is very young software. There are probably at least a few bugs to be worked out, and certainly many optimizations to be made. Any potential user would be well advised to make use of the `gradcheck` function to test that gradients are being calculated correctly for their particular model.
@@ -75,7 +70,7 @@ The first is the use of the [`@paramdef`](#the-paramdef-macro) macro. This is ju
 
 The second is the `@autograd` macro. This tells NeuralNets.jl to collect information in the forward pass required to backpropagate through known operators (see [Operators](#Operators)) in the given block of code. 
 
-Next we apply a cost function, in this case, the negative log likelihood of a categorical variable. Notice we didn't have to transform `prediction` first by exponentiating and normalizing, i.e. applying a softmax. For computational efficiency NeuralNets.jl internally handles this procedure by applying the correct transformation, similarly to how it might be handled in a generalized linear model (GLM) package.
+Next we apply a cost function, in this case, the negative log likelihood of a categorical variable. Notice we didn't have to transform `prediction` first by exponentiating and normalizing, i.e. applying a softmax. For computational efficiency NeuralNets.jl internally handles this procedure by applying the correct transformation for the given cost, similarly to how it might be handled in a generalized linear model (GLM) package.
 
 ```julia
 const X, Y = nnx.randblobs(n_classes, n_features, n_samples)
@@ -121,9 +116,11 @@ The first function version handles the case when the call is not wrapped in a `@
 When the operator is not composed exclusively of existing functions, the user must also define how to compute gradients. The definition of `tanh` serves well for demonstration purposes.
 ```julia
 Base.tanh(inblock::Block) = Block(tanh(inblock.x))
+
 function bwd_tanh(outblock::Block, inblock::Block)
     inblock.dx += (1 .- (outblock.x .* outblock.x)) .* outblock.dx
 end
+
 function Base.tanh(nnet::NeuralNet, inblock::Block)
     outblock = tanh(inblock)
     push!(nnet.bpstack, () -> bwd_tanh(outblock, inblock))
@@ -134,7 +131,7 @@ end
 The only remaining thing to do is to let `@autograd` know about the existence of the new operator. To do this simply add the new op to the `nnet_ops` array defined in `grad.jl`.
 
 ## The `@paramdef` macro
-As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols, `:theta`, or tuples of symbols and integers, `(:theta, 1, 2)`. In the later case the first element must be a symbol. It will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 
+As noted above, `@paramdef` is syntactic sugar for defining variables in the current scope. It works with parameters whose keys are either symbols, `:theta`, or tuples of symbols and integers, `(:theta, 1, 2)`. In the later case the first element must be a symbol, and `@paramdef` will create a variable with tuple elements separated by `_`, i.e. `theta_1_2`. 
 
 The tuple version is generally less useful. The typical use case of parameter keys with integers is programmatic key generation. In this case `@paramdef` maps these programmatically generated keys to back to variable names, which then have to be manipulated by the programmer.
 
@@ -163,8 +160,3 @@ end
 
 ## Backpropagation Technique
 The overall technique for automating backpropagation is essentially the same stack based approach employed by Andrej Karpathy's [recurrentjs](https://github.com/karpathy/recurrentjs). As computation occurs, NeuralNets.jl tracks the application of known operators. The operator then internally handles how its application changes backpropagation by pushing functions onto a backpropagation stack.
-
-### Footnotes
-<a name="interesting-models">1</a>: Models beyond purely feedforward neural networks and slight elaborations on Elman style recurrent neural networks. There are many (probably better) tools for working with such models.
-
-
