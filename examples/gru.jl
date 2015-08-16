@@ -70,7 +70,7 @@ function check_grads()
     n_hid = 5
     n_out = 2
     xs, ys = nnx.randxor(20)
-    nnet = build_model(n_in, n_hid, n_out)    
+    nnet = build_model(n_in, n_hid, n_out)
     f() = predict(nnet, xs, ys)[1]
     gradcheck(nnet, f)
 end
@@ -83,7 +83,7 @@ function fitrnn()
     trX, trY = nnx.randxor(5:20, n_train)
     minlen = minimum(map(length, trX))
     maxlen = maximum(map(length, trX))
-    
+
     nnet = build_model(n_in, n_hid, n_out)
     indices = collect(1:n_train)
     epoch = 0

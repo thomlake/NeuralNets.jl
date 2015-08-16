@@ -45,6 +45,7 @@ function build_model(n_in::Int, n_hid::Int, n_out::Int)
     nnet[:bh] = Zeros(n_hid)
     nnet[:bs] = Zeros(1)
     nnet[:bo] = Zeros(n_out)
+    println(typeof(nnet))
     return nnet
 end
 
@@ -61,7 +62,7 @@ function predict(nnet::NeuralNet, input::Vector)
     z = add(map(i->mult(a[i], h[i]), 1:n)...)
     prediction = affine(v, z, bo)
     return value(prediction)[1], map(i->value(a[i])[1], 1:n)
-end            
+end
 
 function predict(nnet::NeuralNet, input::Vector, target::FloatingPoint)
     @paramdef nnet w u v bh bs bo
@@ -79,7 +80,7 @@ function predict(nnet::NeuralNet, input::Vector, target::FloatingPoint)
         cost = nll_normal(target, prediction)
     end
     return cost
-end          
+end
 
 function testgrads()
     n_in = 2
