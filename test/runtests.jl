@@ -3,7 +3,7 @@ tests = [
     "test_ffann"
 ]
 
-srand(sum(map(int, collect("NeuralNet"))))
+srand(sum(map(Int, collect("NeuralNet"))))
 
 global failed = false
 

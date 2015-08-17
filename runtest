@@ -1,1 +1,1 @@
-julia --color test/runtests.jl
+julia --color=yes test/runtests.jl

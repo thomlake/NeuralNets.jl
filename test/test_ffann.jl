@@ -2,7 +2,7 @@ using Base.Test
 using NeuralNets
 
 function build_model(sizes::Vector{Int})
-    nnet = NeuralNet((Symbol,Int))
+    nnet = NeuralNet(Tuple{Symbol,Int})
     for i = 2:length(sizes)
         nnet[(:W,i-1)] = Orthonormal(sqrt(2), sizes[i], sizes[i-1])
         nnet[(:b,i-1)] = Zeros(sizes[i])
