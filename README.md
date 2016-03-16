@@ -1,3 +1,5 @@
+This repo has been superseded by [Flimsy.jl](https://github.com/thomlake/Flimsy.jl)
+
 # NeuralNets.jl
 NeuralNets.jl is a Julia package for expressing and training a rich class of neural networks whose parameters are differentiable with respect to a scalar loss function.
 
